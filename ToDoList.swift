@@ -9,10 +9,37 @@
 import UIKit
 
 class ToDoList: NSObject {
+    private let fileURL: URL = {
+        let documentDirectoryURLs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentDirectoryURL = documentDirectoryURLs.first!
+        return documentDirectoryURL.appendingPathComponent("todoList.items")
+    }()
+    
     fileprivate var items: [String] = []
+    
+    override init() {
+        super.init()
+        loadItems()
+    }
+    
+    func saveItems() {
+        let itemsArray = items as NSArray
+        
+        print("Saving items to \(fileURL)")
+        if !itemsArray.write(to: fileURL, atomically: true) {
+            print("Could not save toDoList")
+        }
+    }
+    
+    func loadItems() {
+        if let itemsArray = NSArray(contentsOf: fileURL) as? [String] {
+            items = itemsArray
+        }
+    }
     
     func add(_ item: String) {
         items.append(item)
+        saveItems()
     }
 }
 
